@@ -1,5 +1,9 @@
-//madal
+//전역 변수
 const modal = document.getElementsByClassName("loginModal")[0];
+const isLogin = () => {
+    return window.sessionStorage.getItem('id')
+} 
+//madal
 const openModal = () => {
     modal.style.display = "block";
 }
@@ -14,7 +18,7 @@ window.onclick = function(event) {
   }
 
 //login logout
-if(window.sessionStorage.getItem('id')){
+if(isLogin()){
     document.getElementsByClassName("login")[0].style.display = "none";
 }else{
     document.getElementsByClassName("logout")[0].style.display = "none";
@@ -36,13 +40,18 @@ const logout = () =>{
     modal.style.display = "none";
 }
 
+
 //댓글 생성
 const creComment = () => {
-    let comment = document.getElementsByClassName('com-write')[0].value;
-    if(!comment){
-        alert("빈값")
+    if(isLogin()){
+        let comment = document.getElementsByClassName('com-write')[0].value;
+        if(!comment){
+            alert("내용을 입력해 주세요");
+        }else{
+            document.getElementsByClassName("comment")[0].innerHTML = `<div class="com">${comment}<div/>`;
+        }
     }else{
-        document.getElementsByClassName("comment")[0].innerHTML = `<div class="com">${comment}<div/>`;
+        openModal();
     }
 }
 
