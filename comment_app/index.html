@@ -4,11 +4,40 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style src="css/style.css"></style>
+    <link rel="stylesheet" href="css/style.css">
     <title>comment</title>
 </head>
 <body>
-    hello, world
+    <div class="main-container">
+        <button class="login" onclick="openModal()">로그인</button>
+        <button class="logout" onclick="logout()">로그아웃</button>
+        <div class="loginModal">
+            <div class="modal-content">
+                <span class="modal-header">SNS 로그인 해서 댓글 쓰기</span>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+                <button class="login-naver" onclick="login()">네이버로 로그인</button>
+                <button class="login-kakao" onclick="login()">카카오톡으로 로그인</button>
+                <button class="login-facebook" onclick="login()">페이스북으로 로그인</button>
+                <button class="login-google" onclick="login()">구글로 로그인</button>
+                <button class="login-twiter" onclick="login()">트위터로 로그인</button>
+            </div>
+        </div>
+
+        <div class="main-text">본문 입니다</div>
+        <div class="comment-container">댓글
+            <div class="comment"></div>
+            <div class="up" onclick="thumbUpDown(1)">좋아요
+                <span class="up_num">30</span>
+            </div>
+            <div class="down" onclick="thumbUpDown(2)">싫어요</div>
+            <div class="com-mod">수정</div>
+            <div class="com-del">삭제</div>
+        </div>
+        <div class="com-new">
+            <input class="com-write" type="text" placeholder="댓글을 입력해 주세요">
+            <button onclick="creComment()">입력</button>
+        </div>
+    </div>
     <script src="js/main.js"></script>
 </body>
 </html>
