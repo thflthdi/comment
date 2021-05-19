@@ -40,20 +40,64 @@ const logout = () =>{
     modal.style.display = "none";
 }
 
-
+if(!localStorage.getItem('num')){
+    localStorage.setItem('num',0);
+}else{
+    const now = localStorage.getItem('num')
+    let result = ''
+    console.log(now)
+    for(let i=1; i<Number(now)+1;i++){
+        const user = JSON.parse(localStorage.getItem(i))
+        inner = `<div class="comment-user"> user:${user.user}</div><div class="comment-text">text:${user.text} </div>`
+        result = result+inner
+    }
+    document.getElementsByClassName('comment')[0].innerHTML = result;
+}
 //댓글 생성
 const creComment = () => {
     if(isLogin()){
         let comment = document.getElementsByClassName('com-write')[0].value;
+        const num = localStorage.getItem('num')
         if(!comment){
             alert("내용을 입력해 주세요");
         }else{
-            document.getElementsByClassName("comment")[0].innerHTML = `<div class="com">${comment}<div/>`;
+            const now = Number(num)+1
+            localStorage.setItem(now,JSON.stringify({user:isLogin(),text:comment}))
+            localStorage.setItem('num',now)
+
+            let result = '';
+            for(let i=1; i<now+1;i++){
+                const user = JSON.parse(localStorage.getItem(i))
+                inner = `<div class="comment-user"> user:${user.user}</div><div class="comment-text">text:${user.text} </div>`
+                result = result+inner
+            }
+            document.getElementsByClassName('comment')[0].innerHTML = result;
         }
     }else{
         openModal();
     }
 }
+
+// const creComment = () => {
+//    data= [{   title : "damaged JEAN",
+//     content : "18f/w hot item",
+//     price : 75000
+//     },
+//     {
+//     title: "long-sleeve T-shirt",
+//     content: "2019s/s new!",
+//     price: 25000
+//     }];
+//     var html = "<li><h4>{title}</h4><p>{content}</p><div>{price}</div></li>";
+
+//     data.forEach( (el) => {
+//     let result = html.replace("{title}",el.title)
+//          .replace("{content}", el.content)
+//            .replace("{price}", el.price);
+//     el.innerHTML += result;
+//         document.getElementsByClassName('comment')[0].innerHTML = result
+// })
+// }
 
 const thumbUpDown = (value) => {
     console.log(value)
