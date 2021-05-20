@@ -29,6 +29,8 @@ const login = () =>{
     const choice = document.getElementsByName('choiceUser');
     choice.forEach((user)=>{if(user.checked){userId=user.id}})
     window.sessionStorage.setItem('id',userId);
+    localStorage.setItem(userId,JSON.stringify({}))
+
     document.getElementsByClassName("login")[0].style.display = "none";
     document.getElementsByClassName("logout")[0].style.display = "block";
     modal.style.display = "none";
@@ -46,34 +48,37 @@ const logout = () =>{
 const getComment = () => {
     const now = localStorage.getItem('num')
     let result = ''
+
     for(let i=1; i<Number(now)+1;i++){
 
-    try{let user = JSON.parse(localStorage.getItem(i))
-        // let newDiv = document.createElement("div");
-        // let newContent = document.createTextNode(`${user.text}`);
-        // newDiv.appendChild(newContent)
-        inner = `<div class="comment-user"> user:${user.user}</div>
-                    <div class="comment-text">text:${user.text} </div>
-                    <div class="up" onclick="thumbUpDown(1)">좋아요
-                        <span class="up_num">30</span>
-                    </div>
-                    <div class="down" onclick="thumbUpDown(2)">싫어요</div>`
+        try{let user = JSON.parse(localStorage.getItem(i))
+            // let newDiv = document.createElement("div");
+            // let newContent = document.createTextNode(`${user.text}`);
+            // newDiv.appendChild(newContent)
+            inner = `<div class="comment-user"> user:${user.user}</div>
+                        <div class="comment-text">text:${user.text} </div>
+                        <div class="up" id="up-${i}" isclicked="false" onclick="thumbsUp(${i})">좋아요
+                            <span class="up_num">${user.up}</span>
+                        </div>
+                        <div class="down" id="down-${i}" isclicked="false" onclick="thumbsDown(${i})">싫어요
+                            <span class="up_num">${user.down}</span>
+                        </div>`
 
-        if(user.user===isLogin()){
-            inner=inner+`<button class="com-mod" onclick="comMod(${i})">수정</button>
-            <button class="com-del" id="${i}" onclick="comDel(id)">삭제</button>`
-        }
-        inner=inner+`<hr/`
-        result = result+inner
-    }catch(e){
-        // console.log(e)
-        }
+            if(user.user===isLogin()){
+                inner=inner+`<button class="com-mod" onclick="comMod(${i})">수정</button>
+                <button class="com-del" id="${i}" onclick="comDel(id)">삭제</button>`
+            }
+            inner=inner+`<hr/`
+            result = result+inner
+        }catch(e){
+            // console.log(e)
+            }
     }
         return result
 }
 
 if(!localStorage.getItem('num')){
-    localStorage.setItem('num',0);
+    localStorage.setItem('num', 0);
 }else{
     document.getElementsByClassName('comment')[0].innerHTML = getComment();
 }
@@ -87,8 +92,8 @@ const creComment = () => {
             alert("내용을 입력해 주세요");
         }else{
             const now = Number(num)+1
-            localStorage.setItem(now,JSON.stringify({user:isLogin(),text:comment}))
-            localStorage.setItem('num',now)
+            localStorage.setItem(now, JSON.stringify({user:isLogin(), text:comment, up:0, down:0}))
+            localStorage.setItem('num', now)
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
         }
     }else{
@@ -113,7 +118,7 @@ const comMod = (comId) => {
         if(getInfo && getInfo.user === isLogin()){
             document.getElementsByClassName('com-new')[0].innerHTML = 
                 `<input class="com-write" type="text" placeholder="댓글을 입력해 주세요" value="${getInfo.text}">
-                <button onclick="updateComment(${comId})">입력</button>`
+                <button onclick="updateComment(${comId},${getInfo.up},${getInfo.down})">입력</button>`
         }else{
             console.log('update error')
         }
@@ -121,17 +126,32 @@ const comMod = (comId) => {
         console.log('Update Error : cant get Info',e)}
 }
 
-const updateComment = (comId) => {
+const updateComment = (comId,UP,DOWN) => {
     try{
         let comment = document.getElementsByClassName('com-write')[0].value;
-        localStorage.setItem(comId,JSON.stringify({user:isLogin(),text:comment}))
+        localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN}))
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
     }catch(e){console.log(e)}
 }
 
-const thumbUpDown = (value) => {
-    if(value===1){
-        let num = document.getElementsByClassName('up_num')[0].outerHTML;
-        document.getElementsByClassName('up_num')
-    }
+const thumbsUp = (comId) => {
+    try{
+        const comment = JSON.parse(localStorage.getItem(comId));
+        const user = JSON.parse(localStorage.getItem(isLogin()));
+        if(user.comment === 'down'){
+            alert('이미 싫어요한 댓글 입니다.')
+        }else{
+            if(user.comment === 'up'){
+                localStorage.setItem(isLogin(),JSON.stringify({comment:''}))
+                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                    up:comment.up-1, down:comment.down}))
+            }else{
+                localStorage.setItem(isLogin(),JSON.stringify({comment:'up'}))
+                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                    up:comment.up+1, down:comment.down}))
+            }
+        }
+        document.getElementsByClassName('comment')[0].innerHTML = getComment();
+
+    }catch(e){console.log(e)}
 }
