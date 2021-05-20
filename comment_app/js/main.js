@@ -106,7 +106,27 @@ const comDel = (comId) => {
         }
     }catch(e){console.log(e)
         console.log('Delete Error : cant get Info',e)}
-    
+}
+
+const comMod = (comId) => {
+    try{const getInfo = JSON.parse(localStorage.getItem(comId));
+        if(getInfo && getInfo.user === isLogin()){
+            document.getElementsByClassName('com-new')[0].innerHTML = 
+                `<input class="com-write" type="text" placeholder="댓글을 입력해 주세요" value="${getInfo.text}">
+                <button onclick="updateComment(${comId})">입력</button>`
+        }else{
+            console.log('update error')
+        }
+    }catch(e){console.log(e)
+        console.log('Update Error : cant get Info',e)}
+}
+
+const updateComment = (comId) => {
+    try{
+        let comment = document.getElementsByClassName('com-write')[0].value;
+        localStorage.setItem(comId,JSON.stringify({user:isLogin(),text:comment}))
+        document.getElementsByClassName('comment')[0].innerHTML = getComment();
+    }catch(e){console.log(e)}
 }
 
 const thumbUpDown = (value) => {
