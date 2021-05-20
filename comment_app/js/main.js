@@ -29,8 +29,9 @@ const login = () =>{
     const choice = document.getElementsByName('choiceUser');
     choice.forEach((user)=>{if(user.checked){userId=user.id}})
     window.sessionStorage.setItem('id',userId);
-    localStorage.setItem(userId,JSON.stringify({}))
-
+    if(!localStorage.getItem(userId)){
+        localStorage.setItem(userId,JSON.stringify({}))
+    }
     document.getElementsByClassName("login")[0].style.display = "none";
     document.getElementsByClassName("logout")[0].style.display = "block";
     modal.style.display = "none";
@@ -57,10 +58,10 @@ const getComment = () => {
             // newDiv.appendChild(newContent)
             inner = `<div class="comment-user"> user:${user.user}</div>
                         <div class="comment-text">text:${user.text} </div>
-                        <div class="up" id="up-${i}" isclicked="false" onclick="thumbsUp(${i})">좋아요
+                        <div class="up" isclicked="false" onclick="thumbsUp(${i})">좋아요
                             <span class="up_num">${user.up}</span>
                         </div>
-                        <div class="down" id="down-${i}" isclicked="false" onclick="thumbsDown(${i})">싫어요
+                        <div class="down" isclicked="false" onclick="thumbsDown(${i})">싫어요
                             <span class="up_num">${user.down}</span>
                         </div>`
 
@@ -138,20 +139,47 @@ const thumbsUp = (comId) => {
     try{
         const comment = JSON.parse(localStorage.getItem(comId));
         const user = JSON.parse(localStorage.getItem(isLogin()));
-        if(user.comment === 'down'){
+        
+        if(user[comId] === 'down'){
             alert('이미 싫어요한 댓글 입니다.')
         }else{
-            if(user.comment === 'up'){
-                localStorage.setItem(isLogin(),JSON.stringify({comment:''}))
+            if(user[comId] === 'up'){
+                localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
                     up:comment.up-1, down:comment.down}))
             }else{
-                localStorage.setItem(isLogin(),JSON.stringify({comment:'up'}))
+                localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'up'}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
                     up:comment.up+1, down:comment.down}))
             }
         }
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
 
-    }catch(e){console.log(e)}
+    }catch(e){
+        openModal();
+    }
+}
+
+const thumbsDown = (comId) => {
+    try{
+        const comment = JSON.parse(localStorage.getItem(comId));
+        const user = JSON.parse(localStorage.getItem(isLogin()));
+        if(user[comId] === 'up'){
+            alert('이미 좋아요한 댓글 입니다.')
+        }else{
+            if(user[comId] === 'down'){
+                localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
+                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                    up:comment.up, down:comment.down-1}))
+            }else{
+                localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'down'}))
+                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                    up:comment.up, down:comment.down+1}))
+            }
+        }
+        document.getElementsByClassName('comment')[0].innerHTML = getComment();
+
+    }catch(e){
+        openModal();
+    }
 }
