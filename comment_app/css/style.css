@@ -88,38 +88,51 @@
 .login-twitter:hover {
   background-color: #7fccfc;
 }
-
+.main-container {
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-rows: 30px 130px 3fr 30px;
+}
 .main-text {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
   text-align: center;
   padding: 10px;
   width: 90%;
 }
+.left {
+  grid-column: 1;
+  grid-row: 3;
+}
+.right {
+  grid-column: 3;
+  grid-row: 3;
+}
 .comment-container {
-  margin-left: 3rem;
-  margin-right: 3rem;
-  padding: 5px;
+  grid-column: 2;
+  grid-row: 3;
 }
 .comment {
   padding: 8px;
   border: 1px solid lightslategray;
-  border-radius: 12px;
 }
 .comment-text {
-  padding-left: 20px;
-  padding-right: 20px;
-  margin: 10px;
+  margin: 8px;
 }
 .com-new {
+  grid-column: 2;
+  grid-row: 4;
   text-align: center;
-  margin-left: 2rem;
-  margin-right: 5rem;
 }
 .com-write {
+  margin: 5px;
   width: 70%;
-  height: 29px;
+  height: 90%;
 }
 .com-new button {
-  height: 36px;
+  height: 100%;
   width: 70px;
   background-color: whitesmoke;
   border: 1px solid rgb(221, 223, 226);
