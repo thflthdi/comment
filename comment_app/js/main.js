@@ -1,9 +1,12 @@
 //전역 변수
 const modal = document.getElementsByClassName("loginModal")[0];
+
+//login 확인 값
 const isLogin = () => {
     return window.sessionStorage.getItem('id')
 } 
-//madal
+
+//modal
 const openModal = () => {
     modal.style.display = "block";
 }
@@ -11,11 +14,13 @@ const openModal = () => {
 const closeModal = () => {
     modal.style.display = "none";
 }
+
 window.onclick = function(event) {
     if (event.target == modal) {
       modal.style.display = "none";
     }
   }
+
 
 //login logout
 if(isLogin()){
@@ -24,6 +29,8 @@ if(isLogin()){
     document.getElementsByClassName("logout")[0].style.display = "none";
 }
 
+
+//로그인
 const login = () =>{
     let userId = '';
     const choice = document.getElementsByName('choiceUser');
@@ -46,6 +53,8 @@ const logout = () =>{
     document.getElementsByClassName('comment')[0].innerHTML = getComment();
 }
 
+
+//댓글 폼
 const getComment = () => {
     const now = localStorage.getItem('num')
     let result = ''
@@ -84,6 +93,19 @@ if(!localStorage.getItem('num')){
     document.getElementsByClassName('comment')[0].innerHTML = getComment();
 }
 
+
+//댓글 금지어 검사
+const regBad = (comment) => {
+    const badwords = [/^바보|\s바[.\s-]*?보/, /^멍청이|\s멍[.\s-]*?청[.\s-]*?이/, /^똥개|\s똥[.\s-]*?개/, /^해삼|\s해[.\s-]*?삼/, /^말미잘|\s말[.\s-]*?미[.\s-]*?잘/];
+    let badword = []
+    badwords.forEach((word)=>{
+        badword.push(`${word.exec(comment)}`)
+    })
+    let result = badword.filter( bad => bad !== "null")
+    return result
+}
+
+
 //댓글 생성
 const creComment = () => {
     if(isLogin()){
@@ -91,17 +113,23 @@ const creComment = () => {
         const num = localStorage.getItem('num')
         if(!comment){
             alert("내용을 입력해 주세요");
-        }else{
-            const now = Number(num)+1
-            localStorage.setItem(now, JSON.stringify({user:isLogin(), text:comment, up:0, down:0}))
-            localStorage.setItem('num', now)
-        document.getElementsByClassName('comment')[0].innerHTML = getComment();
+        }else{    
+            if(regBad(comment).length > 0){
+                alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
+            }else{
+                const now = Number(num)+1
+                localStorage.setItem(now, JSON.stringify({user:isLogin(), text:comment, up:0, down:0}))
+                localStorage.setItem('num', now)
+                document.getElementsByClassName('comment')[0].innerHTML = getComment();
+            }
         }
     }else{
         openModal();
     }
 }
 
+
+//댓글 삭제
 const comDel = (comId) => {
     try{const getInfo = JSON.parse(localStorage.getItem(comId));
         if(getInfo && getInfo.user === isLogin()){
@@ -114,8 +142,11 @@ const comDel = (comId) => {
         console.log('Delete Error : cant get Info',e)}
 }
 
+
+//댓글 수정 폼
 const comMod = (comId) => {
-    try{const getInfo = JSON.parse(localStorage.getItem(comId));
+    try{
+        const getInfo = JSON.parse(localStorage.getItem(comId));
         if(getInfo && getInfo.user === isLogin()){
             document.getElementsByClassName('com-new')[0].innerHTML = 
                 `<input class="com-write" type="text" placeholder="댓글을 입력해 주세요" value="${getInfo.text}">
@@ -127,19 +158,27 @@ const comMod = (comId) => {
         console.log('Update Error : cant get Info',e)}
 }
 
+
+//댓글 수정
 const updateComment = (comId,UP,DOWN) => {
     try{
         let comment = document.getElementsByClassName('com-write')[0].value;
-        localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN}))
-        document.getElementsByClassName('comment')[0].innerHTML = getComment();
+        if(regBad(comment).length > 0){
+            alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
+        }else{
+            localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN}))
+            document.getElementsByClassName('comment')[0].innerHTML = getComment();
+        }
     }catch(e){console.log(e)}
 }
 
+
+//좋아요
 const thumbsUp = (comId) => {
     try{
         const comment = JSON.parse(localStorage.getItem(comId));
         const user = JSON.parse(localStorage.getItem(isLogin()));
-        
+
         if(user[comId] === 'down'){
             alert('이미 싫어요한 댓글 입니다.')
         }else{
@@ -160,6 +199,8 @@ const thumbsUp = (comId) => {
     }
 }
 
+
+//싫어요
 const thumbsDown = (comId) => {
     try{
         const comment = JSON.parse(localStorage.getItem(comId));
