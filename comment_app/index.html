@@ -15,7 +15,7 @@
             <div class="modal-content">
                 <span class="modal-header">SNS 로그인 해서 댓글 쓰기</span>
                 <span class="modal-close" onclick="closeModal()">&times;</span>
-                <div>
+                <div class="modal-text">
                     로그인 할 유저 선택
                     <input type="radio" id="Alice" value="Alice" name="choiceUser" checked>
                     <label for="Alice">Alice</label>
@@ -24,20 +24,24 @@
                 </div>
                 <ul class="sns-button">
                     <li><button class="login-naver" onclick="login()">네이버로 로그인</button></li>
-                    <li><button class="login-kakao" onclick="login()">카카오톡으로 로그인</button></li>
-                    <li><button class="login-facebook" onclick="login()">페이스북으로 로그인</button></li>
-                    <li><button class="login-google" onclick="login()">구글로 로그인</button></li>
-                    <li><button class="login-twiter" onclick="login()">트위터로 로그인</button></li>
+                    <li><button  class="login-kakao" onclick="login()">카카오톡으로 로그인</button></li>
+                    <li><button  class="login-facebook" onclick="login()">페이스북으로 로그인</button></li>
+                    <li><button  class="login-google" onclick="login()">구글로 로그인</button></li>
+                    <li><button class="login-twitter" onclick="login()">트위터로 로그인</button></li>
                 </ul>
             </div>
         </div>
-        <div class="main-text">본문 입니다</div>
-        <div class="comment-container">댓글
+        <div class="main-text">본문 입니다. <br/>
+            금지어 목록: 바보, 멍청이, 똥개, 해삼, 말미잘<br/>
+            도배 감지 : 10초 동안 5개 이상의 댓글을 올렸을 경우 <br/>
+            도배 감지 후 1분 동안 댓글을 올리실 수 없습니다. <br/>
+        </div>
+        <div class="comment-container">
             <div class="comment"></div>
             
         </div>
         <div class="com-new">
-            <input class="com-write" type="text" placeholder="댓글을 입력해 주세요">
+            <input class="com-write" type="text" onkeypress="onEnter(event)" onclick="isLogined()" placeholder="댓글을 입력해 주세요" />
             <button onclick="creComment()">입력</button>
         </div>
     </div>

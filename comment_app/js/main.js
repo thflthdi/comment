@@ -29,6 +29,11 @@ if(isLogin()){
     document.getElementsByClassName("logout")[0].style.display = "none";
 }
 
+const isLogined = () => {
+    if(!isLogin()){
+        openModal()
+    }
+}
 
 //로그인
 const login = () =>{
@@ -53,6 +58,16 @@ const logout = () =>{
     document.getElementsByClassName('comment')[0].innerHTML = getComment();
 }
 
+//enter
+const onEnter = (e,isMod=false,userId) => {
+    if(e.keyCode==13){
+        if(isMod){
+            updateComment(userId);
+        }else{
+            creComment();
+        }
+    }
+}
 
 //댓글 폼
 const getComment = () => {
@@ -62,14 +77,14 @@ const getComment = () => {
     for(let i=1; i<Number(now)+1;i++){
 
         try{let user = JSON.parse(localStorage.getItem(i))
-            inner = `<div class="comment-user"> user:${user.user}</div>
-                        <div class="comment-text">text:${user.text} </div>
-                        <div class="up" isclicked="false" onclick="thumbsUp(${i})">좋아요
+            inner = `<div class="comment-user">ㄴ ${user.user}</div>
+                        <div class="comment-text">${user.text} </div>
+                        <button class="up" isclicked="false" onclick="thumbsUp(${i})">좋아요
                             <span class="up_num">${user.up}</span>
-                        </div>
-                        <div class="down" isclicked="false" onclick="thumbsDown(${i})">싫어요
+                        </button>
+                        <button class="down" isclicked="false" onclick="thumbsDown(${i})">싫어요
                             <span class="up_num">${user.down}</span>
-                        </div>`
+                        </button>`
 
             if(user.user===isLogin()){
                 inner=inner+`<button class="com-mod" onclick="comMod(${i})">수정</button>
@@ -83,6 +98,7 @@ const getComment = () => {
         return result
 }
 
+//페이지 로딩 시 기본으로 셋팅되는 값
 if(!localStorage.getItem('num')){
     localStorage.setItem('num', 0);
 }else{
@@ -92,7 +108,9 @@ if(!localStorage.getItem('num')){
 
 //댓글 금지어 검사
 const regBad = (comment) => {
-    const badwords = [/^바보|\s바[.\s-]*?보/, /^멍청이|\s멍[.\s-]*?청[.\s-]*?이/, /^똥개|\s똥[.\s-]*?개/, /^해삼|\s해[.\s-]*?삼/, /^말미잘|\s말[.\s-]*?미[.\s-]*?잘/];
+    const badwords = [/^바[.\s-]*?보|\s바[.\s-]*?보|바보$/, /^멍[.\s-]*?청[.\s-]*?이|\s멍[.\s-]*?청[.\s-]*?이|멍청이$/
+    , /^똥[.\s-]*?개|\s똥[.\s-]*?개|똥개$/, /^해[.\s-]*?삼|\s해[.\s-]*?삼|해삼$/
+    , /^말[.\s-]*?미[.\s-]*?잘|\s말[.\s-]*?미[.\s-]*?잘|말미잘$/];
     let badword = []
     badwords.forEach((word)=>{
         badword.push(`${word.exec(comment)}`)
@@ -101,6 +119,10 @@ const regBad = (comment) => {
     return result
 }
 
+const eraseInput = () => {
+    document.getElementsByClassName('com-write')[0].outerHTML = 
+    `<input class="com-write" type="text" onkeypress="onEnter(event)" placeholder="댓글을 입력해 주세요" autofocus value="" />`
+}
 
 //댓글 생성
 const creComment = () => {
@@ -113,17 +135,17 @@ const creComment = () => {
             alert("내용을 입력해 주세요");
         }else{    
             if(regBad(comment).length > 0){
-                alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
+                alert(`금지어를 사용하셨습니다.`);
             }else{
                 if(user.isBad){
                     if(now_time-user.com_time > 60000){
                         localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:0, com_time:'', isBad:false}))
                     }
-                    alert('대기중')
+                    alert('도배로 인해 1분 동안 댓글을 쓸 수 없습니다.')
                 }else{
                     if(user.com_time){
                         if(now_time-user.com_time < 10000 && user.ctn > 4){
-                            alert('초과')
+                            alert('도배를 감지하였습니다. 1분 동안 댓글을 쓸 수 없습니다.')
                             localStorage.setItem(isLogin(),JSON.stringify({...user, com_time:now_time, isBad:true}))
                         }else{
                             if(now_time-user.com_time < 10000){
@@ -145,6 +167,7 @@ const creComment = () => {
                     }
                 }
             }
+            eraseInput();
         }
     }else{
         openModal();
@@ -170,10 +193,11 @@ const comDel = (comId) => {
 const comMod = (comId) => {
     try{
         const getInfo = JSON.parse(localStorage.getItem(comId));
+        const isMod = true
         if(getInfo && getInfo.user === isLogin()){
             document.getElementsByClassName('com-new')[0].innerHTML = 
-                `<input class="com-write" type="text" placeholder="댓글을 입력해 주세요" value="${getInfo.text}">
-                <button onclick="updateComment(${comId},${getInfo.up},${getInfo.down}, ${getInfo.time})">입력</button>`
+                `<input class="com-write" type="text" onkeypress="onEnter(event,${isMod},${comId})" placeholder="댓글을 입력해 주세요" autofocus value="${getInfo.text}" />
+                <button onclick="updateComment(${comId})">입력</button>`
         }else{
             console.log('update error')
         }
@@ -183,14 +207,16 @@ const comMod = (comId) => {
 
 
 //댓글 수정
-const updateComment = (comId,UP,DOWN,TIME) => {
+const updateComment = (comId) => {
     try{
         let comment = document.getElementsByClassName('com-write')[0].value;
+        const pre_comment = JSON.parse(localStorage.getItem(comId));
         if(regBad(comment).length > 0){
             alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
         }else{
-            localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN, time:TIME}))
+            localStorage.setItem(comId, JSON.stringify({...pre_comment, user:isLogin(), text:comment}))
             document.getElementsByClassName('comment')[0].innerHTML = getComment();
+            eraseInput();
         }
     }catch(e){console.log(e)}
 }
