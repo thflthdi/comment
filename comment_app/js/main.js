@@ -98,7 +98,9 @@ const getComment = () => {
         return result
 }
 
-//페이지 로딩 시 기본으로 셋팅되는 값
+//페이지 로딩 시
+//댓글 수를 count 하는 num을 행성
+//댓글이 존재하면 페이지에 댓글 출력
 if(!localStorage.getItem('num')){
     localStorage.setItem('num', 0);
 }else{
