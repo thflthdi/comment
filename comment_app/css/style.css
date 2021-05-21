@@ -94,8 +94,12 @@
   padding: 10px;
   width: 90%;
 }
+.comment-container {
+  margin-left: 3rem;
+  margin-right: 3rem;
+  padding: 5px;
+}
 .comment {
-  width: 90%;
   padding: 8px;
   border: 1px solid lightslategray;
   border-radius: 12px;
@@ -106,9 +110,20 @@
   margin: 10px;
 }
 .com-new {
-  margin: 10px;
+  text-align: center;
+  margin-left: 2rem;
+  margin-right: 5rem;
 }
-
+.com-write {
+  width: 70%;
+  height: 29px;
+}
+.com-new button {
+  height: 36px;
+  width: 70px;
+  background-color: whitesmoke;
+  border: 1px solid rgb(221, 223, 226);
+}
 .up {
   border-radius: 14px;
   background-color: white;
@@ -131,7 +146,4 @@
 }
 .com-mod {
   margin-left: 5px;
-}
-.com-write {
-  width: 300px;
 }
