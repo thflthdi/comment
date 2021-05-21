@@ -37,7 +37,7 @@ const login = () =>{
     choice.forEach((user)=>{if(user.checked){userId=user.id}})
     window.sessionStorage.setItem('id',userId);
     if(!localStorage.getItem(userId)){
-        localStorage.setItem(userId,JSON.stringify({}))
+        localStorage.setItem(userId,JSON.stringify({ctn:0}))
     }
     document.getElementsByClassName("login")[0].style.display = "none";
     document.getElementsByClassName("logout")[0].style.display = "block";
@@ -111,16 +111,38 @@ const creComment = () => {
     if(isLogin()){
         let comment = document.getElementsByClassName('com-write')[0].value;
         const num = localStorage.getItem('num')
+        const user = JSON.parse(localStorage.getItem(isLogin()));
+        const now_time =+ new Date()
         if(!comment){
             alert("내용을 입력해 주세요");
         }else{    
             if(regBad(comment).length > 0){
                 alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
             }else{
-                const now = Number(num)+1
-                localStorage.setItem(now, JSON.stringify({user:isLogin(), text:comment, up:0, down:0}))
-                localStorage.setItem('num', now)
-                document.getElementsByClassName('comment')[0].innerHTML = getComment();
+                if(user.isBad){
+                    if(now_time-user.com_time > 60000){
+                        localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:0, com_time:'', isBad:false}))
+                    }
+                    alert('대기중')
+                }else{
+                    if(user.com_time){
+                        if(now_time-user.com_time < 60000){
+                            localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:user.ctn+1}))
+                        }else{
+                            localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:0, com_time:now_time}))
+                        }
+                        if(now_time-user.com_time < 60000 && user.ctn > 3){
+                            alert('초과')
+                            localStorage.setItem(isLogin(),JSON.stringify({...user, com_time:now_time, isBad:true}))
+                        }
+                    }else{
+                        localStorage.setItem(isLogin(),JSON.stringify({...user,com_time:now_time}))
+                    }
+                    const now_ctn = Number(num)+1
+                    localStorage.setItem(now_ctn, JSON.stringify({user:isLogin(), text:comment, up:0, down:0, time:now_time}))
+                    localStorage.setItem('num', now_ctn)
+                    document.getElementsByClassName('comment')[0].innerHTML = getComment();
+                }
             }
         }
     }else{
@@ -150,7 +172,7 @@ const comMod = (comId) => {
         if(getInfo && getInfo.user === isLogin()){
             document.getElementsByClassName('com-new')[0].innerHTML = 
                 `<input class="com-write" type="text" placeholder="댓글을 입력해 주세요" value="${getInfo.text}">
-                <button onclick="updateComment(${comId},${getInfo.up},${getInfo.down})">입력</button>`
+                <button onclick="updateComment(${comId},${getInfo.up},${getInfo.down}, ${getInfo.time})">입력</button>`
         }else{
             console.log('update error')
         }
@@ -160,13 +182,13 @@ const comMod = (comId) => {
 
 
 //댓글 수정
-const updateComment = (comId,UP,DOWN) => {
+const updateComment = (comId,UP,DOWN,TIME) => {
     try{
         let comment = document.getElementsByClassName('com-write')[0].value;
         if(regBad(comment).length > 0){
             alert(`금지어를 사용하셨습니다 ${regBad(comment)}`);
         }else{
-            localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN}))
+            localStorage.setItem(comId, JSON.stringify({user:isLogin(), text:comment, up:UP, down:DOWN, time:TIME}))
             document.getElementsByClassName('comment')[0].innerHTML = getComment();
         }
     }catch(e){console.log(e)}
@@ -185,16 +207,17 @@ const thumbsUp = (comId) => {
             if(user[comId] === 'up'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up-1, down:comment.down}))
+                    up:comment.up-1, down:comment.down, time:comment.time}))
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'up'}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up+1, down:comment.down}))
+                    up:comment.up+1, down:comment.down, time:comment.time}))
             }
         }
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
 
     }catch(e){
+        console.log(e)
         openModal();
     }
 }
@@ -211,11 +234,11 @@ const thumbsDown = (comId) => {
             if(user[comId] === 'down'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up, down:comment.down-1}))
+                    up:comment.up, down:comment.down-1, time:comment.time}))
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'down'}))
                 localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up, down:comment.down+1}))
+                    up:comment.up, down:comment.down+1, time:comment.time}))
             }
         }
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
