@@ -206,12 +206,15 @@ const thumbsUp = (comId) => {
         }else{
             if(user[comId] === 'up'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
-                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up-1, down:comment.down, time:comment.time}))
+                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                //     up:comment.up-1, down:comment.down, time:comment.time}))
+                localStorage.setItem(comId, JSON.stringify({...comment, up:comment.up-1}))
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'up'}))
-                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up+1, down:comment.down, time:comment.time}))
+                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                    // up:comment.up+1, down:comment.down, time:comment.time}))
+                localStorage.setItem(comId, JSON.stringify({...comment, up:comment.up+1}))
+                    
             }
         }
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
@@ -233,12 +236,15 @@ const thumbsDown = (comId) => {
         }else{
             if(user[comId] === 'down'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
-                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up, down:comment.down-1, time:comment.time}))
+                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                //     up:comment.up, down:comment.down-1, time:comment.time}))
+                localStorage.setItem(comId, JSON.stringify({...comment, down:comment.down-1}))
+
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'down'}))
-                localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    up:comment.up, down:comment.down+1, time:comment.time}))
+                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
+                //     up:comment.up, down:comment.down+1, time:comment.time}))
+                localStorage.setItem(comId, JSON.stringify({...comment, down:comment.down+1}))
             }
         }
         document.getElementsByClassName('comment')[0].innerHTML = getComment();
