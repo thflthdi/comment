@@ -62,9 +62,6 @@ const getComment = () => {
     for(let i=1; i<Number(now)+1;i++){
 
         try{let user = JSON.parse(localStorage.getItem(i))
-            // let newDiv = document.createElement("div");
-            // let newContent = document.createTextNode(`${user.text}`);
-            // newDiv.appendChild(newContent)
             inner = `<div class="comment-user"> user:${user.user}</div>
                         <div class="comment-text">text:${user.text} </div>
                         <div class="up" isclicked="false" onclick="thumbsUp(${i})">좋아요
@@ -81,7 +78,6 @@ const getComment = () => {
             inner=inner+`<hr/`
             result = result+inner
         }catch(e){
-            // console.log(e)
             }
     }
         return result
@@ -126,22 +122,27 @@ const creComment = () => {
                     alert('대기중')
                 }else{
                     if(user.com_time){
-                        if(now_time-user.com_time < 60000){
-                            localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:user.ctn+1}))
-                        }else{
-                            localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:0, com_time:now_time}))
-                        }
-                        if(now_time-user.com_time < 60000 && user.ctn > 3){
+                        if(now_time-user.com_time < 10000 && user.ctn > 4){
                             alert('초과')
                             localStorage.setItem(isLogin(),JSON.stringify({...user, com_time:now_time, isBad:true}))
+                        }else{
+                            if(now_time-user.com_time < 10000){
+                                localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:user.ctn+1}))
+                            }else{
+                                localStorage.setItem(isLogin(),JSON.stringify({...user,ctn:1, com_time:now_time}))
+                            }
+                            const now_ctn = Number(num)+1
+                            localStorage.setItem(now_ctn, JSON.stringify({user:isLogin(), text:comment, up:0, down:0, time:now_time}))
+                            localStorage.setItem('num', now_ctn)
+                            document.getElementsByClassName('comment')[0].innerHTML = getComment();
                         }
                     }else{
-                        localStorage.setItem(isLogin(),JSON.stringify({...user,com_time:now_time}))
+                        localStorage.setItem(isLogin(),JSON.stringify({...user, ctn:1, com_time:now_time}))
+                        const now_ctn = Number(num)+1
+                        localStorage.setItem(now_ctn, JSON.stringify({user:isLogin(), text:comment, up:0, down:0, time:now_time}))
+                        localStorage.setItem('num', now_ctn)
+                        document.getElementsByClassName('comment')[0].innerHTML = getComment();
                     }
-                    const now_ctn = Number(num)+1
-                    localStorage.setItem(now_ctn, JSON.stringify({user:isLogin(), text:comment, up:0, down:0, time:now_time}))
-                    localStorage.setItem('num', now_ctn)
-                    document.getElementsByClassName('comment')[0].innerHTML = getComment();
                 }
             }
         }
@@ -206,13 +207,9 @@ const thumbsUp = (comId) => {
         }else{
             if(user[comId] === 'up'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
-                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                //     up:comment.up-1, down:comment.down, time:comment.time}))
                 localStorage.setItem(comId, JSON.stringify({...comment, up:comment.up-1}))
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'up'}))
-                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                    // up:comment.up+1, down:comment.down, time:comment.time}))
                 localStorage.setItem(comId, JSON.stringify({...comment, up:comment.up+1}))
                     
             }
@@ -236,14 +233,10 @@ const thumbsDown = (comId) => {
         }else{
             if(user[comId] === 'down'){
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:''}))
-                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                //     up:comment.up, down:comment.down-1, time:comment.time}))
                 localStorage.setItem(comId, JSON.stringify({...comment, down:comment.down-1}))
 
             }else{
                 localStorage.setItem(isLogin(),JSON.stringify({...user,[comId]:'down'}))
-                // localStorage.setItem(comId, JSON.stringify({user:comment.user, text:comment.text, 
-                //     up:comment.up, down:comment.down+1, time:comment.time}))
                 localStorage.setItem(comId, JSON.stringify({...comment, down:comment.down+1}))
             }
         }
